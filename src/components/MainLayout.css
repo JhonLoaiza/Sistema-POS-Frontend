@@ -1,0 +1,96 @@
+/* El ancho de nuestro sidebar */
+:root {
+    --sidebar-width: 260px; 
+}
+
+/* El Sidebar (Columna Izquierda) */
+.sidebar {
+    position: fixed; /* Fijo en la pantalla */
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: var(--sidebar-width);
+    background-color: #212529; /* (bg-dark de Bootstrap) */
+    color: white;
+    overflow-y: auto; /* Permite scroll si hay muchos enlaces */
+}
+
+/* Contenido "pegajoso" dentro del sidebar.
+  Usamos flex para empujar el "logout" al fondo.
+*/
+.sidebar-sticky-content {
+    display: flex;
+    flex-direction: column; /* Apilamos los elementos verticalmente */
+    min-height: 100%; /* Ocupa toda la altura */
+    padding: 1.5rem;
+}
+
+/* El Contenido Principal (Columna Derecha) */
+.main-content {
+    /* ¡La clave! Empujamos el contenido a la derecha 
+       para que no quede debajo del sidebar */
+    margin-left: var(--sidebar-width);
+    
+    padding: 2rem; /* Espacio para el contenido */
+    min-height: 100vh;
+    background-color: #f8f9fa; /* (El fondo gris que ya usamos) */
+}
+
+
+/* --- Estilos para los enlaces del Sidebar --- */
+.sidebar .nav-link {
+    color: rgba(255, 255, 255, 0.7); /* Color de texto más suave */
+    border-radius: .25rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Color al pasar el mouse */
+.sidebar .nav-link:hover {
+    background-color: #343a40;
+    color: white;
+}
+
+/* El enlace que está "activo" */
+.sidebar .nav-link.active {
+    background-color: #0d6efd; /* Azul de Bootstrap */
+    color: white;
+    font-weight: 500;
+}
+
+/* --- Estilos para Móvil (Pantallas más pequeñas que 768px) --- */
+@media (max-width: 768px) {
+    
+    .sidebar {
+        /* 1. Ocultamos el sidebar fuera de la pantalla por defecto */
+        transform: translateX(-100%);
+        transition: transform 0.3s ease-in-out;
+        
+        /* 2. Lo ponemos "encima" de todo */
+        z-index: 1050; 
+        
+        /* 3. Añadimos un botón de "Cerrar" */
+        /* (Este lo añadiremos en el JSX) */
+    }
+
+    /* 4. Esta clase (que controlaremos con React) 
+          hace que el sidebar "entre" */
+    .sidebar.show {
+        transform: translateX(0);
+    }
+
+    /* 5. El contenido principal ocupa todo el ancho en móvil */
+    .main-content {
+        margin-left: 0;
+        padding: 1rem; /* Menos padding en móvil */
+        padding-top: 5rem; /* Espacio para la nueva navbar móvil */
+    }
+
+    /* 6. Estilos para el nuevo botón de cerrar 
+          dentro del sidebar */
+    .sidebar-close-btn {
+        position: absolute;
+        top: 1rem;
+        right: 1.5rem;
+        font-size: 1.5rem; /* Icono X más grande */
+    }
+}
