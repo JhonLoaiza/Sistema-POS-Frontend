@@ -3,7 +3,7 @@ import axios from 'axios';
 
 // Esta es la URL base de tu backend.
 // (Asegúrate de que tu backend esté corriendo en el puerto 5000)
-const API_URL = 'http://localhost:5000/api/usuarios/';
+const API_URL = 'https://api-tienda-jhon.onrender.com' || 'http://localhost:5000/api/usuarios/';
 
 const authService = {
     /**

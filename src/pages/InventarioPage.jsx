@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom'; // <--- Importamos el hook de navegación
 import productoService from '../services/producto.service';
 import { useAuth } from '../context/AuthContext.jsx';
 import ProductoModal from '../components/ProductoModal.jsx';
@@ -7,7 +8,7 @@ import { formatCurrencyCLP } from '../utils/formatters.js';
 
 // Componente envoltorio para el diseño
 const PageWrapper = ({ title, children }) => (
-    <div className="card shadow-sm">
+    <div className="card shadow-sm h-100">
         <div className="card-header bg-white py-3">
             <h4 className="mb-0 text-primary"><i className="bi bi-box-seam me-2"></i>{title}</h4>
         </div>
@@ -19,6 +20,8 @@ const PageWrapper = ({ title, children }) => (
 
 function InventarioPage() {
     const { user } = useAuth();
+    const navigate = useNavigate(); // <--- Hook para navegar a otras páginas
+
     const [productos, setProductos] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -186,22 +189,30 @@ function InventarioPage() {
 
     return (
         <PageWrapper title="Gestión de Inventario">
-            {/* Barra superior: Botón Crear + Buscador */}
+            {/* Barra superior: Botones + Buscador */}
             {user && user.usuario.rol === 'admin' && (
-                <div className="row mb-3 g-2">
-                    <div className="col-md-4">
-                        <button className="btn btn-success w-100" onClick={handleCrear}>
+                <div className="row mb-3 g-2 align-items-center">
+                    <div className="col-md-5 d-flex">
+                        <button className="btn btn-success me-2" onClick={handleCrear}>
                             <i className="bi bi-plus-circle me-2"></i>
-                            Crear Nuevo Producto
+                            Crear Nuevo
                         </button>
+                        
+                        {/* --- NUEVO BOTÓN: Ir a Ingreso de Compras --- */}
+                        <button className="btn btn-primary" onClick={() => navigate('/compras/nueva')}>
+                            <i className="bi bi-receipt me-2"></i>
+                            Ingresar Factura
+                        </button>
+                        {/* ------------------------------------------- */}
+                        
                     </div>
-                    <div className="col-md-8">
+                    <div className="col-md-7">
                         <div className="input-group">
                             <span className="input-group-text bg-white"><i className="bi bi-search"></i></span>
                             <input
                                 type="text"
                                 className="form-control"
-                                placeholder="Buscar por nombre o código..."
+                                placeholder="Filtrar por nombre o código..."
                                 value={filtro}
                                 onChange={(e) => setFiltro(e.target.value)}
                             />

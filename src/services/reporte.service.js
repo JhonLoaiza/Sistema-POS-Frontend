@@ -1,7 +1,7 @@
 import axios from 'axios';
 import authService from './auth.service';
 
-const API_URL = 'http://localhost:5000/api/reportes/';
+const API_URL = 'https://api-tienda-jhon.onrender.com' || 'http://localhost:5000/api/reportes/';
 
 const authHeader = () => {
     const usuario = authService.getUsuarioActual();
@@ -23,7 +23,15 @@ const reporteService = {
             headers: authHeader(),
             params: { fecha } 
         });
-    }
+    },
+
+    getRankings: () => {
+        return axios.get(API_URL + 'rankings', { headers: authHeader() });
+    },
+
+    getVentasSemana: () => {
+        return axios.get(API_URL + 'semana', { headers: authHeader() });
+    },
 };
 
 export default reporteService;

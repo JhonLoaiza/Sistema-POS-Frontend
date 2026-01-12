@@ -9,6 +9,10 @@ import VentasPage from './pages/VentasPage.jsx';
 import InventarioPage from './pages/InventarioPage.jsx';
 import ReportesPage from './pages/ReportesPage.jsx';
 import DashboardPage from './pages/DashboardPage.jsx';
+import IngresoCompraPage from './pages/IngresoCompraPage.jsx';
+import HistorialComprasPage from './pages/HistorialCompraPages.jsx';
+import HistorialPage from './pages/HistorialPage.jsx';
+import UsuariosPage from './pages/UsuariosPage.jsx';
 
 // --- ¡Mejoramos los Placeholders! ---
 
@@ -43,7 +47,11 @@ function App() {
             <Route path="dashboard" element={<DashboardPage />} />
             <Route path="ventas" element={<VentasPage />} />
             <Route path="inventario" element={<InventarioPage />} />
+            <Route path="compras/nueva" element={<IngresoCompraPage />} />
             <Route path="reportes" element={<ReportesPage />} />
+            <Route path="compras" element={<HistorialComprasPage />} />
+            <Route path="/historial" element={<HistorialPage />} />
+            <Route path="usuarios" element={<UsuariosPage />} />
           </Route>
         </Route>
         

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import authService from './auth.service'; // Importamos el servicio de auth
 
-const API_URL = 'http://localhost:5000/api/productos/';
+const API_URL = 'https://api-tienda-jhon.onrender.com' || 'http://localhost:5000/api/productos/';
 
 /**
  * Función helper para obtener la cabecera de autorización

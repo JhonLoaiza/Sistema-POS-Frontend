@@ -58,12 +58,38 @@ function MainLayout() {
                             </NavLink>
                         </li>
                         {user && user.usuario.rol === 'admin' && (
-                            <li className="nav-item">
-                                <NavLink className="nav-link" to="/reportes" onClick={closeSidebar}>
-                                    <i className="bi bi-bar-chart-line me-2"></i>
-                                    Reportes
-                                </NavLink>
-                            </li>
+                            <>
+                                <hr className="text-secondary my-2" />
+                                <div className="text-uppercase small text-secondary fw-bold mb-2 ps-3">Administración</div>
+
+                                {/* 3. Historial de Compras (¡NUEVO!) */}
+                                <li className="nav-item">
+                                    <NavLink className="nav-link" to="/compras" onClick={closeSidebar}>
+                                        <i className="bi bi-file-earmark-spreadsheet me-2"></i>
+                                        Historial Compras
+                                    </NavLink>
+                                </li>
+                                <li className="nav-item">
+                                    <NavLink to="/historial" className="nav-link">
+                                    <i className="bi bi-clock-history me-2"></i>
+                                    Historial de Ventas
+                                    </NavLink>
+                                </li>
+
+                                {/* 4. Reportes */}
+                                <li className="nav-item">
+                                    <NavLink className="nav-link" to="/reportes" onClick={closeSidebar}>
+                                        <i className="bi bi-bar-chart-line me-2"></i>
+                                        Reportes Diario
+                                    </NavLink>
+                                </li>
+
+                                <li className="nav-item">
+                                    <NavLink to="/usuarios" className="nav-link text-warning fw-bold">
+                                        <i className="bi bi-people-fill me-2"></i> Usuarios
+                                    </NavLink>
+                                </li>
+                            </>
                         )}
                     </ul>
                     
