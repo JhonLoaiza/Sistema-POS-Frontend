@@ -1,9 +1,7 @@
 // frontend/src/services/auth.service.js
-import axios from 'axios';
 
-// Esta es la URL base de tu backend.
-// (Asegúrate de que tu backend esté corriendo en el puerto 5000)
-const API_URL = 'https://api-tienda-jhon.onrender.com' || 'http://localhost:5000/api/usuarios/';
+// IMPORTANTE: Ajusta la ruta '../config/axios-client' si tu carpeta config está en otro lado
+import client from '../config/axios-client';
 
 const authService = {
     /**
@@ -12,28 +10,33 @@ const authService = {
      * @param {string} password
      */
     login: (username, password) => {
-        return axios.post(API_URL + 'login', {
+        // YA NO usas "axios.post", usas "client.post".
+        // YA NO pones la URL completa, solo la parte final '/login'.
+        // Automáticamente se convierte en: ".../api/usuarios/login"
+        return client.post('/login', {
             username,
             password,
         });
     },
 
     /**
-     * (Lo usaremos después) Cierra la sesión
+     * Cierra la sesión
      */
     logout: () => {
-        // Borraremos el token del almacenamiento local
         localStorage.removeItem('usuario');
     },
 
     /**
-     * (Lo usaremos después) Obtiene el usuario actual
+     * Obtiene el usuario actual
      */
     getUsuarioActual: () => {
-        return JSON.parse(localStorage.getItem('usuario'));
+        // Agregamos un try/catch por seguridad, por si el JSON está corrupto
+        try {
+            return JSON.parse(localStorage.getItem('usuario'));
+        } catch (error) {
+            return null;
+        }
     }
-    
-    // (Aquí podríamos añadir el servicio de registro si quisiéramos)
 };
 
 export default authService;

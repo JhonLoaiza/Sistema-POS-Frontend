@@ -1,15 +1,14 @@
-import axios from 'axios';
-import authService from './auth.service'; // Importamos el servicio de auth
+// frontend/src/services/producto.service.js
 
-const API_URL = 'https://api-tienda-jhon.onrender.com' || 'http://localhost:5000/api/productos/';
+import client from '../config/axios-client';
+import authService from './auth.service';
 
 /**
  * Función helper para obtener la cabecera de autorización
  */
 const authHeader = () => {
-    const usuario = authService.getUsuarioActual(); // Obtenemos el usuario de localStorage
+    const usuario = authService.getUsuarioActual();
     if (usuario && usuario.token) {
-        // Formato estándar de Bearer Token
         return { Authorization: 'Bearer ' + usuario.token };
     } else {
         return {};
@@ -19,33 +18,34 @@ const authHeader = () => {
 const productoService = {
     /**
      * (R-1.2) Obtener todos los productos
+     * URL Final: .../api/productos
      */
     getProductos: () => {
-        return axios.get(API_URL, { headers: authHeader() });
+        return client.get('/productos', { headers: authHeader() });
     },
 
     /**
      * (R-1.1) Crear un nuevo producto
      */
     createProducto: (productoData) => {
-        return axios.post(API_URL, productoData, { headers: authHeader() });
+        return client.post('/productos', productoData, { headers: authHeader() });
     },
 
     /**
      * (R-1.3) Actualizar un producto
+     * URL Final: .../api/productos/123
      */
     updateProducto: (id, productoData) => {
-        return axios.put(API_URL + id, productoData, { headers: authHeader() });
+        // Usamos comillas invertidas para insertar el ID limpiamente
+        return client.put(`/productos/${id}`, productoData, { headers: authHeader() });
     },
 
     /**
      * (R-1.X) "Eliminar" (desactivar) un producto
      */
     deleteProducto: (id) => {
-        return axios.delete(API_URL + id, { headers: authHeader() });
+        return client.delete(`/productos/${id}`, { headers: authHeader() });
     }
-    
-    // (Faltaría getProductoPorId, pero no lo usaremos en esta tabla)
 };
 
 export default productoService;

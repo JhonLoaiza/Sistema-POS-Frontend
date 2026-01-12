@@ -1,7 +1,7 @@
-import axios from 'axios';
-import authService from './auth.service';
+// frontend/src/services/reporte.service.js
 
-const API_URL = 'https://api-tienda-jhon.onrender.com' || 'http://localhost:5000/api/reportes/';
+import client from '../config/axios-client';
+import authService from './auth.service';
 
 const authHeader = () => {
     const usuario = authService.getUsuarioActual();
@@ -16,21 +16,27 @@ const reporteService = {
     /**
      * Obtiene el reporte diario
      * @param {string} fecha - Formato 'YYYY-MM-DD'
+     * URL Final: .../api/reportes/diario
      */
     getReporteDiario: (fecha) => {
-        // Enviamos la fecha como parámetro de consulta (?fecha=...)
-        return axios.get(API_URL + 'diario', { 
+        return client.get('/reportes/diario', { 
             headers: authHeader(),
             params: { fecha } 
         });
     },
 
+    /**
+     * URL Final: .../api/reportes/rankings
+     */
     getRankings: () => {
-        return axios.get(API_URL + 'rankings', { headers: authHeader() });
+        return client.get('/reportes/rankings', { headers: authHeader() });
     },
 
+    /**
+     * URL Final: .../api/reportes/semana
+     */
     getVentasSemana: () => {
-        return axios.get(API_URL + 'semana', { headers: authHeader() });
+        return client.get('/reportes/semana', { headers: authHeader() });
     },
 };
 

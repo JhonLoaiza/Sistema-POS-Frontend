@@ -1,8 +1,10 @@
-import axios from 'axios';
+// frontend/src/services/compra.service.js
+
+// 1. Importamos nuestra instancia configurada
+import client from '../config/axios-client';
 import authService from './auth.service';
 
-const API_URL = 'https://api-tienda-jhon.onrender.com' || 'http://localhost:5000/api/compras/';
-
+// 2. Función auxiliar para el header (se mantiene igual, pero es vital)
 const authHeader = () => {
     const usuario = authService.getUsuarioActual();
     if (usuario && usuario.token) {
@@ -14,20 +16,20 @@ const authHeader = () => {
 
 const compraService = {
     registrarCompra: (compraData) => {
-        return axios.post(API_URL, compraData, { headers: authHeader() });
+        // Usamos client.post apuntando a la ruta específica '/compras'
+        return client.post('/compras', compraData, { headers: authHeader() });
     },
 
-    // Nuevas funciones
     getCompras: (desde, hasta) => {
-        // Enviamos los params a la URL
-        return axios.get(API_URL, { 
+        return client.get('/compras', { 
             headers: authHeader(),
             params: { desde, hasta } 
         });
     },
 
     getDetalleCompra: (id) => {
-        return axios.get(API_URL + id, { headers: authHeader() });
+        // Usamos template literal para concatenar el ID limpiamente
+        return client.get(`/compras/${id}`, { headers: authHeader() });
     }
 };
 
