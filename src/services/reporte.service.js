@@ -15,8 +15,7 @@ const authHeader = () => {
 const reporteService = {
     /**
      * Obtiene el reporte diario
-     * @param {string} fecha - Formato 'YYYY-MM-DD'
-     * URL Final: .../api/reportes/diario
+     * URL Final: .../api/reportes/diario?fecha=YYYY-MM-DD
      */
     getReporteDiario: (fecha) => {
         return client.get('/reportes/diario', { 
@@ -38,6 +37,18 @@ const reporteService = {
     getVentasSemana: () => {
         return client.get('/reportes/semana', { headers: authHeader() });
     },
+
+    /**
+     * Obtiene el Cierre de Caja (Calcula efectivo vs gastos)
+     * URL Final: .../api/reportes/cierre-caja?fecha=YYYY-MM-DD
+     * --- ¡ESTA ES LA QUE FALTABA! ---
+     */
+    getCierreCaja: (fecha) => {
+        return client.get('/reportes/cierre-caja', { 
+            headers: authHeader(),
+            params: { fecha } 
+        });
+    }
 };
 
 export default reporteService;

@@ -1,22 +1,37 @@
 import React, { useState, useEffect } from 'react';
-import ventaService from '../services/venta.service'; // Importamos el servicio
+import ventaService from '../services/venta.service';
 import { toast } from 'react-toastify';
 import { formatCurrencyCLP } from '../utils/formatters';
 
 const HistorialPage = () => {
     const [ventas, setVentas] = useState([]);
     const [loading, setLoading] = useState(true);
+    
+    // --- 1. Nuevos estados para Paginación ---
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
 
+    // --- 2. Cargar ventas cuando cambia la página ---
     useEffect(() => {
-        cargarVentas();
-    }, []);
+        cargarVentas(page);
+    }, [page]); 
 
-    const cargarVentas = async () => {
+    const cargarVentas = async (paginaActual) => {
         try {
             setLoading(true);
-            // Usamos el servicio en lugar de axios directo
-            const res = await ventaService.getVentas();
-            setVentas(res.data);
+            // Llamamos al servicio pasando el número de página
+            const res = await ventaService.getVentas(paginaActual);
+            
+            // --- 3. Ajustamos para leer la nueva estructura del backend ---
+            // Backend devuelve: { data: [...ventas], pagination: { totalPages: X, ... } }
+            if (res.data && res.data.data) {
+                setVentas(res.data.data);
+                setTotalPages(res.data.pagination.totalPages);
+            } else {
+                // Fallback por si el backend aún no se actualizó
+                setVentas(Array.isArray(res.data) ? res.data : []);
+            }
+            
             setLoading(false);
         } catch (error) {
             console.error(error);
@@ -29,21 +44,29 @@ const HistorialPage = () => {
         if (!window.confirm("¿Seguro que quieres anular esta venta? El stock se devolverá al inventario.")) return;
 
         try {
-            // Usamos el servicio para anular
             await ventaService.anularVenta(id);
             toast.success("Venta anulada y stock recuperado");
-            cargarVentas(); // Recargar la lista
+            cargarVentas(page); // Recargamos la página actual
         } catch (error) {
             console.error(error);
             toast.error(error.response?.data?.message || "Error al anular venta");
         }
     };
 
+    // --- 4. Funciones de Navegación ---
+    const handlePrev = () => {
+        if (page > 1) setPage(page - 1);
+    };
+
+    const handleNext = () => {
+        if (page < totalPages) setPage(page + 1);
+    };
+
     return (
         <div className="container mt-4 mb-5">
             <div className="d-flex justify-content-between align-items-center mb-4">
                 <h2 className="text-primary"><i className="bi bi-clock-history me-2"></i>Historial de Ventas</h2>
-                <button className="btn btn-outline-primary btn-sm" onClick={cargarVentas}>
+                <button className="btn btn-outline-primary btn-sm" onClick={() => cargarVentas(page)}>
                     <i className="bi bi-arrow-clockwise me-1"></i> Actualizar
                 </button>
             </div>
@@ -107,6 +130,31 @@ const HistorialPage = () => {
                         </table>
                     </div>
                 </div>
+
+                {/* --- 5. CONTROLES DE PAGINACIÓN (Footer) --- */}
+                {!loading && ventas.length > 0 && (
+                    <div className="card-footer bg-white d-flex justify-content-between align-items-center py-3">
+                        <span className="text-muted small">
+                            Página <strong>{page}</strong> de <strong>{totalPages}</strong>
+                        </span>
+                        
+                        <nav aria-label="Navegación de ventas">
+                            <ul className="pagination mb-0">
+                                <li className={`page-item ${page === 1 ? 'disabled' : ''}`}>
+                                    <button className="page-link" onClick={handlePrev}>
+                                        <span aria-hidden="true">&laquo; Anterior</span>
+                                    </button>
+                                </li>
+                                
+                                <li className={`page-item ${page === totalPages ? 'disabled' : ''}`}>
+                                    <button className="page-link" onClick={handleNext}>
+                                        <span aria-hidden="true">Siguiente &raquo;</span>
+                                    </button>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                )}
             </div>
         </div>
     );
