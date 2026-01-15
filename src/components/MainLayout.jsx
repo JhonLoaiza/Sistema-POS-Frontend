@@ -70,7 +70,7 @@ function MainLayout() {
                                     </NavLink>
                                 </li>
                                 <li className="nav-item">
-                                    <NavLink to="/historial" className="nav-link">
+                                    <NavLink to="/historial" className="nav-link" onClick={closeSidebar}>
                                     <i className="bi bi-clock-history me-2"></i>
                                     Historial de Ventas
                                     </NavLink>

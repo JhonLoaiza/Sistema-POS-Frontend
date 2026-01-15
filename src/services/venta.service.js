@@ -16,6 +16,16 @@ const ventaService = {
     crearVenta: (ventaData) => {
         // URL Final: .../api/ventas
         return client.post('/ventas', ventaData, { headers: authHeader() });
+    },
+
+    // 2. Obtener el historial (ESTA ES LA QUE TE FALTA)
+    getVentas: () => {
+        return client.get('/ventas');
+    },
+
+    // 3. Anular una venta por ID
+    anularVenta: (id) => {
+        return client.delete(`/ventas/${id}`);
     }
 };
 
