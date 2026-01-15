@@ -1,4 +1,4 @@
-import React, { useState } from 'react'; // 1. Importamos useState
+import React, { useState } from 'react';
 import { Outlet, useNavigate, NavLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import './MainLayout.css'; 
@@ -7,85 +7,108 @@ function MainLayout() {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
 
-    // 2. Añadimos el estado para controlar el sidebar en móvil
+    // Estado para controlar el sidebar en móvil
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     const handleLogout = () => {
         logout();
+        setIsSidebarOpen(false); // Asegurar cierre al salir
         navigate('/login');
     };
     
-    // 3. Función para cerrar el sidebar (útil al hacer clic en un enlace)
+    // Función para cerrar el sidebar
     const closeSidebar = () => {
-        if (isSidebarOpen) {
-            setIsSidebarOpen(false);
-        }
+        setIsSidebarOpen(false);
     };
 
     return (
-        <div>
+        <div className="d-flex h-100 position-relative">
             
-            {/* --- 4. Sidebar (Ahora con estado) --- */}
-            {/* Le aplicamos la clase 'show' dinámicamente */}
-            <div className={`sidebar ${isSidebarOpen ? 'show' : ''}`}>
-                <div className="sidebar-sticky-content">
-                    
-                    {/* Botón de Cerrar (Solo visible en móvil) */}
-                    <button 
-                        className="btn btn-link text-white d-md-none sidebar-close-btn"
-                        onClick={() => setIsSidebarOpen(false)}
-                    >
-                        <i className="bi bi-x-lg"></i>
-                    </button>
+            {/* --- 1. OVERLAY (FONDO OSCURO) --- */}
+            {/* Esto permite cerrar el menú haciendo clic fuera de él en móviles */}
+            {isSidebarOpen && (
+                <div 
+                    className="d-md-none"
+                    onClick={closeSidebar}
+                    style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        width: '100vw',
+                        height: '100vh',
+                        backgroundColor: 'rgba(0,0,0,0.5)',
+                        zIndex: 1040 // Justo debajo del sidebar
+                    }}
+                />
+            )}
 
-                    <NavLink className="navbar-brand text-white mb-4" to="/dashboard" onClick={closeSidebar}>
-                        <i className="bi bi-shop me-2"></i>
-                        Tienda POS
-                    </NavLink>
+            {/* --- 2. SIDEBAR --- */}
+            <div 
+                className={`sidebar bg-dark text-white p-3 ${isSidebarOpen ? 'show' : ''}`}
+                style={{
+                    // Estilos base para asegurar comportamiento si falla el CSS externo
+                    transition: 'transform 0.3s ease-in-out',
+                    zIndex: 1050
+                }}
+            >
+                <div className="sidebar-sticky-content h-100 d-flex flex-column">
                     
+                    {/* Cabecera Sidebar con Botón Cerrar */}
+                    <div className="d-flex justify-content-between align-items-center mb-4">
+                        <NavLink className="navbar-brand text-white fw-bold fs-4" to="/ventas" onClick={closeSidebar}>
+                            <i className="bi bi-shop me-2"></i>
+                            Tienda POS
+                        </NavLink>
+                        
+                        <button 
+                            className="btn btn-sm btn-outline-light d-md-none"
+                            onClick={closeSidebar}
+                        >
+                            <i className="bi bi-x-lg"></i>
+                        </button>
+                    </div>
+                    
+                    {/* Menú de Navegación */}
                     <ul className="nav nav-pills flex-column mb-auto">
-                        {/* 5. Hacemos que los enlaces cierren el menú en móvil */}
-                        <li className="nav-item">
-                            <NavLink className="nav-link" to="/ventas" onClick={closeSidebar}>
+                        <li className="nav-item mb-2">
+                            <NavLink className="nav-link text-white" to="/ventas" onClick={closeSidebar}>
                                 <i className="bi bi-cart-plus me-2"></i>
                                 Punto de Venta
                             </NavLink>
                         </li>
-                        <li className="nav-item">
-                            <NavLink className="nav-link" to="/inventario" onClick={closeSidebar}>
+                        <li className="nav-item mb-2">
+                            <NavLink className="nav-link text-white" to="/inventario" onClick={closeSidebar}>
                                 <i className="bi bi-box-seam me-2"></i>
                                 Inventario
                             </NavLink>
                         </li>
+
+                        {/* Sección Admin */}
                         {user && user.usuario.rol === 'admin' && (
                             <>
                                 <hr className="text-secondary my-2" />
                                 <div className="text-uppercase small text-secondary fw-bold mb-2 ps-3">Administración</div>
 
-                                {/* 3. Historial de Compras (¡NUEVO!) */}
-                                <li className="nav-item">
-                                    <NavLink className="nav-link" to="/compras" onClick={closeSidebar}>
+                                <li className="nav-item mb-2">
+                                    <NavLink className="nav-link text-white" to="/compras" onClick={closeSidebar}>
                                         <i className="bi bi-file-earmark-spreadsheet me-2"></i>
                                         Historial Compras
                                     </NavLink>
                                 </li>
-                                <li className="nav-item">
-                                    <NavLink to="/historial" className="nav-link">
-                                    <i className="bi bi-clock-history me-2"></i>
-                                    Historial de Ventas
+                                <li className="nav-item mb-2">
+                                    <NavLink to="/historial" className="nav-link text-white" onClick={closeSidebar}>
+                                        <i className="bi bi-clock-history me-2"></i>
+                                        Historial Ventas
                                     </NavLink>
                                 </li>
-
-                                {/* 4. Reportes */}
-                                <li className="nav-item">
-                                    <NavLink className="nav-link" to="/reportes" onClick={closeSidebar}>
+                                <li className="nav-item mb-2">
+                                    <NavLink className="nav-link text-white" to="/reportes" onClick={closeSidebar}>
                                         <i className="bi bi-bar-chart-line me-2"></i>
                                         Reportes Diario
                                     </NavLink>
                                 </li>
-
-                                <li className="nav-item">
-                                    <NavLink to="/usuarios" className="nav-link text-warning fw-bold">
+                                <li className="nav-item mb-2">
+                                    <NavLink to="/usuarios" className="nav-link text-warning fw-bold" onClick={closeSidebar}>
                                         <i className="bi bi-people-fill me-2"></i> Usuarios
                                     </NavLink>
                                 </li>
@@ -93,40 +116,40 @@ function MainLayout() {
                         )}
                     </ul>
                     
+                    {/* Pie de página del Sidebar */}
                     <hr className="text-white" />
-                    <div className="text-white mb-2">
+                    <div className="text-white mb-2 small">
                         <i className="bi bi-person-circle me-2"></i>
                         Hola, {user ? user.usuario.nombre : 'Usuario'}
                     </div>
-                    <button className="btn btn-outline-danger w-100" onClick={handleLogout}>
+                    <button className="btn btn-outline-danger w-100 btn-sm" onClick={handleLogout}>
                         <i className="bi bi-box-arrow-right me-1"></i>
                         Salir
                     </button>
                 </div>
             </div>
 
-            {/* --- Contenido Principal (Columna Derecha) --- */}
-            <div className="main-content">
+            {/* --- 3. CONTENIDO PRINCIPAL --- */}
+            <div className="flex-grow-1 d-flex flex-column" style={{ minHeight: '100vh', overflowX: 'hidden' }}>
                 
-                {/* --- 6. Navbar Móvil (Hamburguesa) --- */}
-                {/* Esta barra solo se ve en pantallas pequeñas (d-md-none) */}
-                <nav className="navbar navbar-light bg-light fixed-top d-md-none shadow-sm">
-                    <div className="container-fluid">
-                        <button 
-                            className="btn btn-link" 
-                            type="button"
-                            onClick={() => setIsSidebarOpen(true)}
-                        >
-                            <i className="bi bi-list fs-3"></i> {/* Ícono Hamburguesa */}
-                        </button>
-                        <span className="navbar-brand mb-0 h1">
-                            Tienda POS
-                        </span>
-                    </div>
+                {/* Navbar Móvil (Hamburguesa) - Solo visible en móvil */}
+                <nav className="navbar navbar-light bg-white border-bottom d-md-none px-3 py-2 sticky-top">
+                    <button 
+                        className="btn btn-outline-primary" 
+                        type="button"
+                        onClick={() => setIsSidebarOpen(true)}
+                    >
+                        <i className="bi bi-list fs-4"></i>
+                    </button>
+                    <span className="navbar-brand mb-0 h1 ms-2 text-primary">
+                        Tienda POS
+                    </span>
                 </nav>
                 
-                {/* 7. El Outlet (tu página) ahora vive aquí */}
-                <Outlet />
+                {/* Aquí se renderizan las páginas */}
+                <div className="p-0 h-100 bg-light">
+                    <Outlet />
+                </div>
             </div>
         </div>
     );
