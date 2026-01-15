@@ -28,8 +28,8 @@ function VentasPage() {
     
     // Estados Modales
     const [showTicketModal, setShowTicketModal] = useState(false);
-    const [showGastoModal, setShowGastoModal] = useState(false); // NUEVO ESTADO
-    const [showCierreModal, setShowCierreModal] = useState(false); // ESTADO PARA CIERRE CAJA
+    const [showGastoModal, setShowGastoModal] = useState(false); 
+    const [showCierreModal, setShowCierreModal] = useState(false); 
     
     const [ultimoCarrito, setUltimoCarrito] = useState([]); 
     const [ultimoTotal, setUltimoTotal] = useState(0);
@@ -46,6 +46,20 @@ function VentasPage() {
             toast.error("Error al cargar inventario");
             setLoading(false);
         }
+    };
+
+    // --- FIX: FUNCIÓN PARA GESTIONAR LAS IMÁGENES (Cloudinary vs Local) ---
+    const getImagenUrl = (imagen) => {
+        if (!imagen) return null;
+        
+        // 1. Si es de Cloudinary (empieza con http), usar tal cual
+        if (imagen.startsWith('http')) return imagen;
+
+        // 2. Si es local, construir URL basada en variable de entorno
+        const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+        const SERVER_URL = API_URL.replace('/api', '');
+        
+        return `${SERVER_URL}/${imagen}`;
     };
 
     const productosFiltrados = productos.filter(p =>
@@ -119,7 +133,6 @@ function VentasPage() {
                         <input type="text" className="form-control form-control-lg" placeholder="Buscar..." value={filtro} onChange={(e) => setFiltro(e.target.value)} autoFocus />
                     </div>
                     <div className="flex-grow-1 overflow-auto" style={{ maxHeight: '70vh' }}>
-                        {/* AQUI USAMOS LA VARIABLE LOADING PARA ELIMINAR EL WARNING */}
                         {loading ? (
                             <div className="text-center mt-5">
                                 <div className="spinner-border text-primary" role="status">
@@ -131,7 +144,20 @@ function VentasPage() {
                                 {productosFiltrados.map(p => (
                                     <button key={p.id} className={`list-group-item list-group-item-action d-flex align-items-center p-2 ${p.stock <= 0 ? 'disabled bg-light' : ''}`} onClick={() => agregarAlCarrito(p)} disabled={p.stock <= 0}>
                                         <div className="me-3">
-                                            {p.imagen ? <img src={`http://localhost:5000/${p.imagen}`} alt={p.nombre} className="rounded border" style={{ width: '60px', height: '60px', objectFit: 'cover' }} /> : <div className="bg-light d-flex align-items-center rounded border" style={{width:'60px', height:'60px', justifyContent:'center'}}><i className="bi bi-box-seam text-muted fs-4"></i></div>}
+                                            {/* --- AQUI APLICAMOS LA CORRECCIÓN DE IMAGEN --- */}
+                                            {p.imagen ? (
+                                                <img 
+                                                    src={getImagenUrl(p.imagen)} 
+                                                    alt={p.nombre} 
+                                                    className="rounded border" 
+                                                    style={{ width: '60px', height: '60px', objectFit: 'cover' }} 
+                                                    onError={(e) => { e.target.onerror = null; e.target.src = "https://via.placeholder.com/60?text=Error"; }}
+                                                />
+                                            ) : (
+                                                <div className="bg-light d-flex align-items-center rounded border" style={{width:'60px', height:'60px', justifyContent:'center'}}>
+                                                    <i className="bi bi-box-seam text-muted fs-4"></i>
+                                                </div>
+                                            )}
                                         </div>
                                         <div className="flex-grow-1 text-start">
                                             <div className="d-flex justify-content-between">

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom'; // <--- Importamos el hook de navegación
+import { useNavigate } from 'react-router-dom';
 import productoService from '../services/producto.service';
 import { useAuth } from '../context/AuthContext.jsx';
 import ProductoModal from '../components/ProductoModal.jsx';
@@ -20,7 +20,7 @@ const PageWrapper = ({ title, children }) => (
 
 function InventarioPage() {
     const { user } = useAuth();
-    const navigate = useNavigate(); // <--- Hook para navegar a otras páginas
+    const navigate = useNavigate();
 
     const [productos, setProductos] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -48,6 +48,27 @@ function InventarioPage() {
             setError('Error al cargar el inventario.');
             setLoading(false);
         }
+    };
+
+    // --- FUNCIÓN AUXILIAR PARA IMÁGENES (FIX CLOUDINARY + LOCAL) ---
+    const getImagenUrl = (imagen) => {
+        if (!imagen) return null; // Si es null, retornamos null para mostrar el icono
+
+        // 1. Si la imagen viene de Cloudinary (empieza con http), la usamos tal cual
+        if (imagen.startsWith('http')) {
+            return imagen;
+        }
+
+        // 2. Si es una imagen vieja (local), construimos la URL del servidor
+        // NOTA: Al no usar Vite, usamos process.env.REACT_APP_API_URL
+        const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+        
+        // Quitamos '/api' para obtener la raíz del servidor (donde vive la carpeta uploads)
+        const SERVER_URL = API_URL.replace('/api', ''); 
+        
+        // Asegúrate de que tu backend sirva la imagen correctamente. 
+        // Si en la BD guardaste "uploads/foto.jpg", esto funcionará:
+        return `${SERVER_URL}/${imagen}`;
     };
     
     // --- MANEJADORES DEL MODAL ---
@@ -126,14 +147,15 @@ function InventarioPage() {
                     <tbody>
                         {productosFiltrados.map((producto) => (
                             <tr key={producto.id}>
-                                {/* Columna Imagen */}
+                                {/* Columna Imagen: APLICAMOS EL FIX AQUÍ */}
                                 <td>
                                     {producto.imagen ? (
                                         <img 
-                                            src={`http://localhost:5000/${producto.imagen}`} 
+                                            src={getImagenUrl(producto.imagen)} 
                                             alt={producto.nombre} 
                                             className="img-thumbnail"
                                             style={{ width: '50px', height: '50px', objectFit: 'cover' }}
+                                            onError={(e) => { e.target.onerror = null; e.target.src = "https://via.placeholder.com/50?text=Error"; }}
                                         />
                                     ) : (
                                         <div className="bg-secondary text-white d-flex align-items-center justify-content-center rounded" style={{width: '50px', height: '50px'}}>
@@ -155,7 +177,7 @@ function InventarioPage() {
                                     </span>
                                 </td>
                                 
-                                {/* Botones de Acción (Usan handleEditar y handleEliminar) */}
+                                {/* Botones de Acción */}
                                 {user && user.usuario.rol === 'admin' && (
                                     <td>
                                         <button 
@@ -198,12 +220,10 @@ function InventarioPage() {
                             Crear Nuevo
                         </button>
                         
-                        {/* --- NUEVO BOTÓN: Ir a Ingreso de Compras --- */}
                         <button className="btn btn-primary" onClick={() => navigate('/compras/nueva')}>
                             <i className="bi bi-receipt me-2"></i>
                             Ingresar Factura
                         </button>
-                        {/* ------------------------------------------- */}
                         
                     </div>
                     <div className="col-md-7">
