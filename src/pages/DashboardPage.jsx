@@ -77,7 +77,8 @@ const DashboardPage = () => {
     const dataBarras = {
         labels: ventasSemana.map(v => {
              // Manejo seguro de fecha
-             const [a, m, d] = v.fecha_venta ? v.fecha_venta.split('-') : ['00','00','00']; 
+             const fechaParts = v.fecha_venta ? v.fecha_venta.split('-') : ['00','00','00'];
+             const [, m, d] = fechaParts; 
              return `${d}/${m}`;
         }),
         datasets: [{

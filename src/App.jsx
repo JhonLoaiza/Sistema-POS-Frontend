@@ -15,22 +15,6 @@ import HistorialComprasPage from './pages/HistorialCompraPages.jsx';
 import HistorialPage from './pages/HistorialPage.jsx';
 import UsuariosPage from './pages/UsuariosPage.jsx';
 
-// --- ¡Mejoramos los Placeholders! ---
-
-// Función helper para crear una página con tarjeta
-const PageWrapper = ({ title, children }) => (
-    <div className="card shadow-sm">
-        <div className="card-header">
-            <h2 className="mb-0">{title}</h2>
-        </div>
-        <div className="card-body">
-            {children || <p>Contenido de la página...</p>}
-        </div>
-    </div>
-);
-
-// Usamos el PageWrapper para nuestras páginas
-// const InventarioPage = () => <PageWrapper title="Gestión de Inventario" />;
 const NotFoundPage = () => <h1>404 - Página no encontrada</h1>;
 
 

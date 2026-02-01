@@ -20,4 +20,10 @@ const eliminarUsuario = (id) => {
     return client.delete(`/usuarios/${id}`);
 };
 
-export default { crearUsuario, obtenerUsuarios, eliminarUsuario };
+const usuarioService = {
+    crearUsuario,
+    obtenerUsuarios,
+    eliminarUsuario
+};
+
+export default usuarioService;

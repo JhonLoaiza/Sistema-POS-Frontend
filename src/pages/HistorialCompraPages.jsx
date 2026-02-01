@@ -36,6 +36,7 @@ function HistorialComprasPage() {
     // Cargar compras cuando cambien las fechas
     useEffect(() => {
         cargarCompras();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [fechaDesde, fechaHasta]); // <-- Se dispara al cambiar fechas
 
     const cargarCompras = async () => {

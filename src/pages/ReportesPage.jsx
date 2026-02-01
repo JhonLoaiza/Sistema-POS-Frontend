@@ -26,6 +26,7 @@ function ReportesPage() {
     // 2. Cargar reporte cuando cambia la fecha
     useEffect(() => {
         cargarReporte();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [fecha]); // <-- Se ejecuta cada vez que cambias la fecha
 
     const cargarReporte = async () => {
