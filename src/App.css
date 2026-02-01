@@ -1,3 +1,4 @@
+/* --- ESTILOS POR DEFECTO DE REACT (MANTENER) --- */
 .App {
   text-align: center;
 }
@@ -35,4 +36,101 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+/* --- ESTILOS DE IMPRESIÓN UNIVERSAL (TÉRMICA Y CARTA) --- */
+@media print {
+    /* 1. Reset básico */
+    @page {
+        margin: 0;
+        size: auto;
+    }
+
+    body, html {
+        background-color: white !important;
+        height: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: visible !important;
+    }
+
+    /* 2. Ocultar todo lo de la App (Modales, fondo, menú) */
+    body * {
+        visibility: hidden !important;
+    }
+
+    .modal-backdrop, .modal, .fade {
+        display: none !important;
+    }
+
+    /* 3. CONFIGURACIÓN DEL TICKET */
+    #section-to-print {
+        visibility: visible !important;
+        position: absolute !important;
+        top: 0 !important;
+        
+        /* EL TRUCO DE LA ADAPTABILIDAD: */
+        left: 50% !important;           /* Mueve el inicio al centro de la hoja */
+        transform: translateX(-50%) !important; /* Retrocede el 50% del ancho del ticket */
+        /* Esto centra el elemento matemáticamente sin importar el ancho del papel */
+
+        width: 100% !important;         /* Intenta ocupar todo el ancho disponible... */
+        max-width: 80mm !important;     /* ...PERO detente si llegas a 80mm */
+        
+        /* Estilos visuales */
+        background: white !important;
+        padding: 10px 5px !important;
+        
+        /* Opcional: Borde discontinuo para que se vea bonito en hoja grande */
+        /* En impresora térmica este borde a veces ni se nota porque está al límite */
+        border: 1px dashed #333 !important; 
+        margin-top: 20px !important;    /* Un poco de aire arriba */
+
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        z-index: 2147483647 !important;
+    }
+
+    /* 4. Asegurar que el contenido interno sea visible */
+    #section-to-print * {
+        visibility: visible !important;
+        text-align: center !important;
+    }
+
+    /* 5. Tamaños de fuente equilibrados (Ni muy chicos ni gigantes) */
+    #section-to-print h4 {
+        font-size: 18px !important;
+        font-weight: bold !important;
+        margin-bottom: 10px !important;
+        text-transform: uppercase;
+        font-family: sans-serif !important; /* Sans-serif se lee mejor en térmica */
+    }
+
+    #section-to-print p, 
+    #section-to-print span {
+        font-size: 14px !important;
+        font-family: 'Courier New', Courier, monospace !important; /* Monospace para datos */
+        color: #000 !important;
+        margin: 5px 0 !important;
+    }
+
+    /* El monto destacado pero no exagerado */
+    #section-to-print h2 {
+        font-size: 32px !important;
+        font-weight: 900 !important;
+        margin: 15px 0 !important;
+        border-top: 2px solid black;
+        border-bottom: 2px solid black;
+        padding: 5px 0;
+        width: 100%; /* Que la línea ocupe todo el ancho del ticket */
+    }
+
+    /* Ajuste para la descripción */
+    #section-to-print .descripcion-container {
+        font-size: 16px !important;
+        font-weight: bold !important;
+        margin: 20px 0 !important;
+        word-wrap: break-word !important; /* Evita que palabras largas rompan el ancho */
+    }
 }

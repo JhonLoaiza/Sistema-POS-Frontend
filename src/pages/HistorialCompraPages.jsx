@@ -104,6 +104,7 @@ function HistorialComprasPage() {
                                 <th>Fecha</th>
                                 <th>N° Factura</th>
                                 <th>Proveedor</th>
+                                <th>Repartidor</th>
                                 <th>Registrado Por</th>
                                 <th>Total</th>
                                 <th>Acciones</th>
@@ -112,10 +113,19 @@ function HistorialComprasPage() {
                         <tbody>
                             {compras.map(compra => (
                                 <tr key={compra.id}>
-                                    {/* Ajuste de zona horaria simple para visualización */}
                                     <td>{new Date(compra.fecha).toLocaleDateString('es-CL')}</td>
                                     <td className="fw-bold">{compra.nro_factura}</td>
                                     <td>{compra.proveedor}</td>
+                                    <td>
+                                        {compra.nombre_repartidor ? (
+                                            <span className="badge bg-light text-dark border">
+                                                <i className="bi bi-truck me-1"></i>
+                                                {compra.nombre_repartidor}
+                                            </span>
+                                        ) : (
+                                            <span className="text-muted small">-</span>
+                                        )}
+                                    </td>
                                     <td><span className="badge bg-secondary">{compra.usuario_nombre}</span></td>
                                     <td className="fw-bold text-success">{formatCurrencyCLP(compra.total_compra)}</td>
                                     <td>
@@ -126,7 +136,7 @@ function HistorialComprasPage() {
                                 </tr>
                             ))}
                             {compras.length === 0 && (
-                                <tr><td colSpan="6" className="text-center p-4 text-muted">No se encontraron compras en este rango de fechas.</td></tr>
+                                <tr><td colSpan="7" className="text-center p-4 text-muted">No se encontraron compras en este rango de fechas.</td></tr>
                             )}
                         </tbody>
                     </table>

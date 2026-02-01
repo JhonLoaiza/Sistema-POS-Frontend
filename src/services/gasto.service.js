@@ -3,9 +3,9 @@
 import client from '../config/axios-client';
 
 const gastosService = {
-    registrarGasto: (data) => {
-        // Al usar client, esto se traduce a: .../api/gastos
-        return client.post('/gastos', data);
+registrarRetiro: (datos) => {
+        // datos = { monto: 5000, descripcion: "Pago proveedor" }
+        return client.post('/gastos', datos);
     },
 
     obtenerGastosHoy: () => {

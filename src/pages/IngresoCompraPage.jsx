@@ -24,7 +24,8 @@ function IngresoCompraPage() {
     const [cabecera, setCabecera] = useState({
         proveedor: '',
         nro_factura: '',
-        fecha: new Date().toISOString().split('T')[0]
+        fecha: new Date().toISOString().split('T')[0],
+        nombre_repartidor: '' // <--- NUEVO CAMPO
     });
 
     // Estado de los Items (Filas)
@@ -92,15 +93,19 @@ function IngresoCompraPage() {
             <form onSubmit={handleSubmit}>
                 {/* Cabecera */}
                 <div className="row mb-4 p-3 bg-light rounded border">
-                    <div className="col-md-4 mb-3">
+                    <div className="col-md-3 mb-3">
                         <label className="form-label fw-bold">Proveedor</label>
                         <input type="text" className="form-control" name="proveedor" value={cabecera.proveedor} onChange={handleCabeceraChange} required placeholder="Ej: Coca Cola Andina" />
                     </div>
-                    <div className="col-md-4 mb-3">
+                    <div className="col-md-3 mb-3">
                         <label className="form-label fw-bold">N° Factura</label>
                         <input type="text" className="form-control" name="nro_factura" value={cabecera.nro_factura} onChange={handleCabeceraChange} required placeholder="Ej: F-123456" />
                     </div>
-                    <div className="col-md-4 mb-3">
+                    <div className="col-md-3 mb-3">
+                        <label className="form-label fw-bold">Nombre Repartidor</label>
+                        <input type="text" className="form-control" name="nombre_repartidor" value={cabecera.nombre_repartidor} onChange={handleCabeceraChange} placeholder="Ej: Juan Pérez" />
+                    </div>
+                    <div className="col-md-3 mb-3">
                         <label className="form-label fw-bold">Fecha</label>
                         <input type="date" className="form-control" name="fecha" value={cabecera.fecha} onChange={handleCabeceraChange} required />
                     </div>

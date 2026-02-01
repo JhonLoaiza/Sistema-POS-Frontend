@@ -4,10 +4,9 @@ import ventaService from '../services/venta.service';
 import { toast } from 'react-toastify'; 
 import { formatCurrencyCLP } from '../utils/formatters.js';
 import TicketModal from '../components/TicketModal.jsx';
-// IMPORTAMOS EL NUEVO MODAL DE GASTOS
-import GastoModal from '../components/GastoModal.jsx';
 // IMPORTAMOS EL MODAL DE CIERRE DE CAJA
 import CierreCajaModal from '../components/CierreCajaModal.jsx';
+import RetiroCajaModal from '../components/RetiroCaja.jsx';
 
 const PageWrapper = ({ title, children }) => (
     <div className="card shadow-sm h-100">
@@ -28,7 +27,7 @@ function VentasPage() {
     
     // Estados Modales
     const [showTicketModal, setShowTicketModal] = useState(false);
-    const [showGastoModal, setShowGastoModal] = useState(false); 
+    const [showRetiroCajaModal, setShowRetiroCajaModal] = useState(false); 
     const [showCierreModal, setShowCierreModal] = useState(false); 
     
     const [ultimoCarrito, setUltimoCarrito] = useState([]); 
@@ -205,7 +204,7 @@ function VentasPage() {
                             </div>
                             
                             {/* --- BOTÓN DE GASTOS --- */}
-                            <button className="btn btn-outline-danger w-100 mb-2" onClick={() => setShowGastoModal(true)}>
+                            <button className="btn btn-outline-danger w-100 mb-2" onClick={() => setShowRetiroCajaModal(true)}>
                                 <i className="bi bi-dash-circle me-2"></i> Registrar Gasto / Retiro
                             </button>
 
@@ -229,7 +228,7 @@ function VentasPage() {
                 <TicketModal show={showTicketModal} handleClose={() => setShowTicketModal(false)} items={ultimoCarrito} total={ultimoTotal} onNuevaVenta={handleCerrarTicket} />
                 
                 {/* MODAL DE GASTOS */}
-                <GastoModal show={showGastoModal} handleClose={() => setShowGastoModal(false)} />
+                <RetiroCajaModal show={showRetiroCajaModal} handleClose={() => setShowRetiroCajaModal(false)} />
 
                 {/* MODAL DE CIERRE DE CAJA */}
                 <CierreCajaModal show={showCierreModal} handleClose={() => setShowCierreModal(false)} />
