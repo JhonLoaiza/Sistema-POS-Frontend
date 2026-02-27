@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import productoService from '../services/producto.service';
+import mermaService from '../services/merma.service';
 import { useAuth } from '../context/AuthContext.jsx';
 import ProductoModal from '../components/ProductoModal.jsx';
+import MermaModal from '../components/MermaModal.jsx';
 import { toast } from 'react-toastify';
 import { formatCurrencyCLP } from '../utils/formatters.js';
 
@@ -30,12 +32,57 @@ function InventarioPage() {
     const [showModal, setShowModal] = useState(false);
     const [productoSeleccionado, setProductoSeleccionado] = useState(null);
     
+    // Estados para Modal de Mermas
+    const [showMermaModal, setShowMermaModal] = useState(false);
+    const [productoMerma, setProductoMerma] = useState(null);
+    
     // Estado para el Buscador
     const [filtro, setFiltro] = useState('');
+    
+    // Ref para mantener el focus en el input
+    const inputRef = React.useRef(null);
+    
+    // Ref para detectar nuevo escaneo
+    const ultimoEscaneoRef = React.useRef(Date.now());
+    const tiempoEntreEscaneos = 1000; // 1 segundo entre escaneos
 
     useEffect(() => {
         cargarProductos();
     }, []);
+
+    // Mantener focus en el input siempre
+    useEffect(() => {
+        if (inputRef.current) {
+            inputRef.current.focus();
+        }
+    }, [productos, filtro]);
+
+    // Detectar escaneo de código de barras
+    useEffect(() => {
+        if (filtro.length >= 10 && productos.length > 0) {
+            const productoExacto = productos.find(p => p.codigo_barras === filtro);
+            if (productoExacto) {
+                // Producto encontrado - el filtro permanece activo
+                toast.success(`Producto encontrado: ${productoExacto.nombre}`);
+                ultimoEscaneoRef.current = Date.now();
+            }
+        }
+    }, [filtro, productos]);
+    
+    // Manejar cambio de filtro con detección de nuevo escaneo
+    const handleFiltroChange = (e) => {
+        const nuevoValor = e.target.value;
+        const ahora = Date.now();
+        
+        // Si ha pasado más de 1 segundo desde el último escaneo y el input tiene contenido,
+        // asumimos que es un nuevo escaneo y limpiamos primero
+        if (ahora - ultimoEscaneoRef.current > tiempoEntreEscaneos && filtro.length > 0 && nuevoValor.length > filtro.length) {
+            setFiltro(nuevoValor.slice(-1)); // Solo el último carácter
+            ultimoEscaneoRef.current = ahora;
+        } else {
+            setFiltro(nuevoValor);
+        }
+    };
 
     const cargarProductos = async () => {
         try {
@@ -52,23 +99,21 @@ function InventarioPage() {
 
     // --- FUNCIÓN AUXILIAR PARA IMÁGENES (FIX CLOUDINARY + LOCAL) ---
     const getImagenUrl = (imagen) => {
-        if (!imagen) return null; // Si es null, retornamos null para mostrar el icono
+        if (!imagen) return null;
 
-        // 1. Si la imagen viene de Cloudinary (empieza con http), la usamos tal cual
+        // Si la imagen viene de Cloudinary (empieza con http), la usamos tal cual
         if (imagen.startsWith('http')) {
             return imagen;
         }
 
-        // 2. Si es una imagen vieja (local), construimos la URL del servidor
-        // NOTA: Al no usar Vite, usamos process.env.REACT_APP_API_URL
+        // Construir URL del servidor
         const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+        const SERVER_URL = API_URL.replace('/api', '');
         
-        // Quitamos '/api' para obtener la raíz del servidor (donde vive la carpeta uploads)
-        const SERVER_URL = API_URL.replace('/api', ''); 
+        // Limpiar la ruta: quitar slash inicial si existe
+        const rutaLimpia = imagen.startsWith('/') ? imagen.substring(1) : imagen;
         
-        // Asegúrate de que tu backend sirva la imagen correctamente. 
-        // Si en la BD guardaste "uploads/foto.jpg", esto funcionará:
-        return `${SERVER_URL}/${imagen}`;
+        return `${SERVER_URL}/${rutaLimpia}`;
     };
     
     // --- MANEJADORES DEL MODAL ---
@@ -116,6 +161,28 @@ function InventarioPage() {
         }
     };
 
+    const handleRegistrarMerma = (producto) => {
+        setProductoMerma(producto);
+        setShowMermaModal(true);
+    };
+
+    const handleCloseMermaModal = () => {
+        setShowMermaModal(false);
+        setProductoMerma(null);
+    };
+
+    const handleSaveMerma = async (mermaData) => {
+        try {
+            await mermaService.createMerma(mermaData);
+            toast.success('Merma registrada exitosamente');
+            handleCloseMermaModal();
+            cargarProductos();
+        } catch (err) {
+            console.error(err);
+            toast.error('Error al registrar la merma');
+        }
+    };
+
     // --- RENDERIZADO ---
     let contenido;
     if (loading) {
@@ -141,7 +208,7 @@ function InventarioPage() {
                             <th>Costo</th>
                             <th>Venta</th>
                             <th>Stock</th>
-                            {user && user.usuario.rol === 'admin' && <th>Acciones</th>}
+                            <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -178,27 +245,38 @@ function InventarioPage() {
                                 </td>
                                 
                                 {/* Botones de Acción */}
-                                {user && user.usuario.rol === 'admin' && (
-                                    <td>
-                                        <button 
-                                            className="btn btn-sm btn-warning me-2"
-                                            onClick={() => handleEditar(producto)} 
-                                        >
-                                            <i className="bi bi-pencil-fill"></i>
-                                        </button>
-                                        <button 
-                                            className="btn btn-sm btn-danger"
-                                            onClick={() => handleEliminar(producto.id)}
-                                        >
-                                            <i className="bi bi-trash-fill"></i>
-                                        </button>
-                                    </td>
-                                )}
+                                <td>
+                                    {user && user.usuario.rol === 'admin' && (
+                                        <>
+                                            <button 
+                                                className="btn btn-sm btn-warning me-2"
+                                                onClick={() => handleEditar(producto)} 
+                                                title="Editar"
+                                            >
+                                                <i className="bi bi-pencil-fill"></i>
+                                            </button>
+                                            <button 
+                                                className="btn btn-sm btn-danger me-2"
+                                                onClick={() => handleEliminar(producto.id)}
+                                                title="Eliminar"
+                                            >
+                                                <i className="bi bi-trash-fill"></i>
+                                            </button>
+                                        </>
+                                    )}
+                                    <button 
+                                        className="btn btn-sm btn-secondary"
+                                        onClick={() => handleRegistrarMerma(producto)}
+                                        title="Registrar Merma"
+                                    >
+                                        <i className="bi bi-exclamation-triangle"></i>
+                                    </button>
+                                </td>
                             </tr>
                         ))}
                         {productosFiltrados.length === 0 && (
                             <tr>
-                                <td colSpan="8" className="text-center py-4 text-muted">
+                                <td colSpan="9" className="text-center py-4 text-muted">
                                     No se encontraron productos.
                                 </td>
                             </tr>
@@ -230,12 +308,24 @@ function InventarioPage() {
                         <div className="input-group">
                             <span className="input-group-text bg-white"><i className="bi bi-search"></i></span>
                             <input
+                                ref={inputRef}
                                 type="text"
                                 className="form-control"
                                 placeholder="Filtrar por nombre o código..."
                                 value={filtro}
-                                onChange={(e) => setFiltro(e.target.value)}
+                                onChange={handleFiltroChange}
+                                autoFocus
                             />
+                            {filtro && (
+                                <button 
+                                    className="btn btn-outline-secondary" 
+                                    type="button"
+                                    onClick={() => setFiltro('')}
+                                    title="Limpiar búsqueda"
+                                >
+                                    <i className="bi bi-x-lg"></i>
+                                </button>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -248,6 +338,13 @@ function InventarioPage() {
                 handleClose={handleCloseModal}
                 producto={productoSeleccionado}
                 onSave={handleSave}
+            />
+
+            <MermaModal 
+                show={showMermaModal}
+                handleClose={handleCloseMermaModal}
+                producto={productoMerma}
+                onSave={handleSaveMerma}
             />
         </PageWrapper>
     );

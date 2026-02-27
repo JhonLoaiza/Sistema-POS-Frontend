@@ -76,6 +76,14 @@ function MainLayout() {
                                     </NavLink>
                                 </li>
 
+                                {/* Mermas */}
+                                <li className="nav-item">
+                                    <NavLink className="nav-link" to="/mermas" onClick={closeSidebar}>
+                                        <i className="bi bi-exclamation-triangle me-2"></i>
+                                        Mermas/Pérdidas
+                                    </NavLink>
+                                </li>
+
                                 {/* 4. Reportes */}
                                 <li className="nav-item">
                                     <NavLink className="nav-link" to="/reportes" onClick={closeSidebar}>
