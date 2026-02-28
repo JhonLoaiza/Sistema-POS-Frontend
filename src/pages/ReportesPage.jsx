@@ -34,7 +34,16 @@ function ReportesPage() {
         try {
             setLoading(true);
             const response = await reporteService.getReporteDiario(fecha);
-            setDatos(response.data);
+            // Asegurar que todos los campos existan con valores por defecto
+            const datosCompletos = {
+                ventas: response.data.ventas || { total: 0, cantidad: 0 },
+                gastos: response.data.gastos || { total: 0, cantidad: 0 },
+                mermas: response.data.mermas || { valor: 0, cantidad: 0 },
+                utilidad: response.data.utilidad || 0,
+                ventasPorMetodo: response.data.ventasPorMetodo || [],
+                topProductos: response.data.topProductos || []
+            };
+            setDatos(datosCompletos);
             setLoading(false);
         } catch (error) {
             console.error(error);
