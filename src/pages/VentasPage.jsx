@@ -25,6 +25,9 @@ function VentasPage() {
     const [carrito, setCarrito] = useState([]);
     const [loading, setLoading] = useState(true);
     
+    // Ref para mantener el focus en el input
+    const inputRef = React.useRef(null);
+    
     // Estados Modales
     const [showTicketModal, setShowTicketModal] = useState(false);
     const [showRetiroCajaModal, setShowRetiroCajaModal] = useState(false); 
@@ -34,6 +37,13 @@ function VentasPage() {
     const [ultimoTotal, setUltimoTotal] = useState(0);
 
     useEffect(() => { cargarProductos(); }, []);
+
+    // Mantener focus en el input siempre
+    useEffect(() => {
+        if (inputRef.current) {
+            inputRef.current.focus();
+        }
+    }, [carrito, filtro]);
 
     const cargarProductos = async () => {
         try {
@@ -47,24 +57,39 @@ function VentasPage() {
         }
     };
 
-    // --- FIX: FUNCIÓN PARA GESTIONAR LAS IMÁGENES (Cloudinary vs Local) ---
     const getImagenUrl = (imagen) => {
         if (!imagen) return null;
         
-        // 1. Si es de Cloudinary (empieza con http), usar tal cual
+        // Si es de Cloudinary (empieza con http), usar tal cual
         if (imagen.startsWith('http')) return imagen;
 
-        // 2. Si es local, construir URL basada en variable de entorno
+        // Si es local, construir URL basada en variable de entorno
         const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
         const SERVER_URL = API_URL.replace('/api', '');
         
-        return `${SERVER_URL}/${imagen}`;
+        // Limpiar la ruta: quitar slash inicial si existe
+        const rutaLimpia = imagen.startsWith('/') ? imagen.substring(1) : imagen;
+        
+        return `${SERVER_URL}/${rutaLimpia}`;
     };
 
     const productosFiltrados = productos.filter(p =>
         p.nombre.toLowerCase().includes(filtro.toLowerCase()) ||
         (p.codigo_barras && p.codigo_barras.includes(filtro))
     );
+
+    // Detectar escaneo de código de barras y agregar automáticamente
+    useEffect(() => {
+        if (filtro.length >= 10 && productos.length > 0) {
+            const productoExacto = productos.find(p => p.codigo_barras === filtro);
+            if (productoExacto) {
+                agregarAlCarrito(productoExacto);
+                // Limpiar el input después de agregar
+                setTimeout(() => setFiltro(''), 100);
+            }
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [filtro]);
 
     const totalVenta = carrito.reduce((acc, item) => acc + (item.precio_venta * item.cantidad), 0);
 
@@ -129,7 +154,7 @@ function VentasPage() {
                 <div className="col-md-7 d-flex flex-column h-100">
                     <div className="input-group mb-3">
                         <span className="input-group-text bg-white"><i className="bi bi-search"></i></span>
-                        <input type="text" className="form-control form-control-lg" placeholder="Buscar..." value={filtro} onChange={(e) => setFiltro(e.target.value)} autoFocus />
+                        <input ref={inputRef} type="text" className="form-control form-control-lg" placeholder="Buscar..." value={filtro} onChange={(e) => setFiltro(e.target.value)} autoFocus />
                     </div>
                     <div className="flex-grow-1 overflow-auto" style={{ maxHeight: '70vh' }}>
                         {loading ? (

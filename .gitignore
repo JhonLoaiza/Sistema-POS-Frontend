@@ -1,23 +1,76 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# ============================================
+# SmartPOS Frontend - .gitignore
+# ============================================
 
-# dependencies
-/node_modules
-/.pnp
-.pnp.js
-
-# testing
-/coverage
-
-# production
-/build
-
-# misc
-.DS_Store
+# === ARCHIVOS SENSIBLES (NUNCA SUBIR) ===
+.env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
+.env.production
 
+# === DEPENDENCIAS ===
+node_modules/
+/.pnp
+.pnp.js
+.pnp.*
+
+# === TESTING ===
+/coverage
+.nyc_output
+
+# === PRODUCCIÓN ===
+/build
+/dist
+
+# === MISC ===
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# === DEBUG ===
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# === IDE / EDITORES ===
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+*.sublime-project
+*.sublime-workspace
+
+# === REACT ===
+.eslintcache
+
+# === TEMPORALES ===
+.cache/
+.parcel-cache/
+.next/
+.nuxt/
+.vuepress/dist
+.serverless/
+.fusebox/
+.dynamodb/
+.tern-port
+
+# === OTROS ===
+*.log
+*.pid
+*.seed
+*.pid.lock
+.npm
+.yarn-integrity

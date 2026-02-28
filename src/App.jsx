@@ -13,6 +13,7 @@ import DashboardPage from './pages/DashboardPage.jsx';
 import IngresoCompraPage from './pages/IngresoCompraPage.jsx';
 import HistorialComprasPage from './pages/HistorialCompraPages.jsx';
 import HistorialPage from './pages/HistorialPage.jsx';
+import HistorialMermasPage from './pages/HistorialMermasPage.jsx';
 import UsuariosPage from './pages/UsuariosPage.jsx';
 
 const NotFoundPage = () => <h1>404 - Página no encontrada</h1>;
@@ -36,6 +37,7 @@ function App() {
             <Route path="reportes" element={<ReportesPage />} />
             <Route path="compras" element={<HistorialComprasPage />} />
             <Route path="/historial" element={<HistorialPage />} />
+            <Route path="/mermas" element={<HistorialMermasPage />} />
             <Route path="usuarios" element={<UsuariosPage />} />
           </Route>
         </Route>

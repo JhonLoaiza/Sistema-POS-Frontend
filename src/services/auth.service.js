@@ -4,8 +4,7 @@ import client from '../config/axios-client';
 
 const authService = {
     login: (username, password) => {
-        // CORRECCIÓN: Agregamos '/usuarios' antes de '/login'
-        return client.post('/usuarios/login', {
+        return client.post('/auth/login', {
             username,
             password,
         });

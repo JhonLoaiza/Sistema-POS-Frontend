@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import reporteService from '../services/reporte.service';
 import { toast } from 'react-toastify';
 import { formatCurrencyCLP } from '../utils/formatters.js';
+import { generarReporteDiarioPDF } from '../utils/pdfGenerator.js';
 
 const PageWrapper = ({ title, children }) => (
     <div className="card shadow-sm h-100">
@@ -42,25 +43,52 @@ function ReportesPage() {
         }
     };
 
+    const handleGenerarPDF = () => {
+        if (!datos) {
+            toast.warning("No hay datos para generar el PDF");
+            return;
+        }
+        try {
+            generarReporteDiarioPDF(datos, fecha);
+            toast.success("PDF generado exitosamente");
+        } catch (error) {
+            console.error(error);
+            toast.error("Error al generar el PDF");
+        }
+    };
+
     return (
         <PageWrapper title="Reporte Diario">
             
             {/* --- Selector de Fecha --- */}
-            <div className="row mb-4 align-items-center">
-                <div className="col-auto">
-                    <label className="form-label fw-bold me-2">Fecha del Reporte:</label>
+            <div className="row mb-4 g-2">
+                <div className="col-12 col-md-auto">
+                    <label className="form-label fw-bold mb-2">Fecha del Reporte:</label>
                 </div>
-                <div className="col-auto">
+                <div className="col-12 col-sm-6 col-md-auto">
                     <input 
                         type="date" 
-                        className="form-control"
+                        className="form-control w-100"
                         value={fecha}
                         onChange={(e) => setFecha(e.target.value)}
                     />
                 </div>
-                <div className="col-auto">
-                    <button className="btn btn-outline-primary" onClick={cargarReporte}>
-                        <i className="bi bi-arrow-clockwise"></i> Actualizar
+                <div className="col-6 col-sm-3 col-md-auto">
+                    <button className="btn btn-outline-primary w-100" onClick={cargarReporte}>
+                        <i className="bi bi-arrow-clockwise me-1"></i>
+                        <span className="d-none d-sm-inline">Actualizar</span>
+                        <span className="d-inline d-sm-none">Actualizar</span>
+                    </button>
+                </div>
+                <div className="col-6 col-sm-3 col-md-auto ms-md-auto">
+                    <button 
+                        className="btn btn-danger w-100" 
+                        onClick={handleGenerarPDF}
+                        disabled={!datos}
+                    >
+                        <i className="bi bi-file-pdf me-1"></i>
+                        <span className="d-none d-sm-inline">Descargar PDF</span>
+                        <span className="d-inline d-sm-none">PDF</span>
                     </button>
                 </div>
             </div>
@@ -70,36 +98,103 @@ function ReportesPage() {
             ) : datos ? (
                 <div>
                     {/* --- Tarjetas de Resumen --- */}
-                    <div className="row mb-4">
+                    <div className="row mb-4 g-3">
                         {/* Ventas Totales */}
-                        <div className="col-md-6 mb-3">
+                        <div className="col-12 col-md-4">
                             <div className="card text-white bg-primary h-100 shadow">
-                                <div className="card-body text-center">
-                                    <h5 className="card-title opacity-75">Ventas Totales</h5>
-                                    <p className="display-4 fw-bold mb-0">
+                                <div className="card-body text-center py-4">
+                                    <h6 className="card-title opacity-75 mb-2">Ventas Totales</h6>
+                                    <p className="display-6 fw-bold mb-2">
                                         {formatCurrencyCLP(datos.total_ventas)}
                                     </p>
-                                    <small>Ingresos brutos del día</small>
+                                    <small className="d-block">Ingresos brutos del día</small>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Ganancia (Solo Lorena la ve) */}
-                        <div className="col-md-6 mb-3">
+                        {/* Ganancia Bruta */}
+                        <div className="col-12 col-md-4">
                             <div className="card text-white bg-success h-100 shadow">
-                                <div className="card-body text-center">
-                                    <h5 className="card-title opacity-75">Ganancia Estimada</h5>
-                                    <p className="display-4 fw-bold mb-0">
+                                <div className="card-body text-center py-4">
+                                    <h6 className="card-title opacity-75 mb-2">Ganancia Bruta</h6>
+                                    <p className="display-6 fw-bold mb-2">
                                         {formatCurrencyCLP(datos.ganancia_bruta)}
                                     </p>
-                                    <small>Ventas - Costos</small>
+                                    <small className="d-block">Ventas - Costos</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Flujo de Caja Neto */}
+                        <div className="col-12 col-md-4">
+                            <div className={`card text-white h-100 shadow ${datos.flujo_caja_neto >= 0 ? 'bg-info' : 'bg-danger'}`}>
+                                <div className="card-body text-center py-4">
+                                    <h6 className="card-title opacity-75 mb-2">Flujo de Caja Neto</h6>
+                                    <p className="display-6 fw-bold mb-2">
+                                        {formatCurrencyCLP(datos.flujo_caja_neto)}
+                                    </p>
+                                    <small className="d-block">Ventas - Egresos</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* --- Sección de Egresos --- */}
+                    <div className="row mb-4">
+                        <div className="col-12">
+                            <h5 className="mb-3"><i className="bi bi-arrow-down-circle text-danger me-2"></i>Egresos del Día</h5>
+                            <div className="row g-3">
+                                {/* Compras */}
+                                <div className="col-12 col-md-4">
+                                    <div className="card border-warning h-100">
+                                        <div className="card-body">
+                                            <div className="d-flex justify-content-between align-items-center">
+                                                <div className="flex-grow-1">
+                                                    <h6 className="text-muted mb-1">Compras</h6>
+                                                    <h4 className="mb-0 text-warning">{formatCurrencyCLP(datos.compras)}</h4>
+                                                </div>
+                                                <i className="bi bi-cart-plus fs-1 text-warning opacity-50 d-none d-sm-block"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Gastos/Retiros */}
+                                <div className="col-12 col-md-4">
+                                    <div className="card border-danger h-100">
+                                        <div className="card-body">
+                                            <div className="d-flex justify-content-between align-items-center">
+                                                <div className="flex-grow-1">
+                                                    <h6 className="text-muted mb-1">Gastos/Retiros</h6>
+                                                    <h4 className="mb-0 text-danger">{formatCurrencyCLP(datos.gastos)}</h4>
+                                                </div>
+                                                <i className="bi bi-wallet2 fs-1 text-danger opacity-50 d-none d-sm-block"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Mermas */}
+                                <div className="col-12 col-md-4">
+                                    <div className="card border-secondary h-100">
+                                        <div className="card-body">
+                                            <div className="d-flex justify-content-between align-items-center">
+                                                <div className="flex-grow-1">
+                                                    <h6 className="text-muted mb-1">Mermas</h6>
+                                                    <h4 className="mb-0 text-secondary">{formatCurrencyCLP(datos.mermas.valor)}</h4>
+                                                    <small className="text-muted">{datos.mermas.cantidad} unidades</small>
+                                                </div>
+                                                <i className="bi bi-trash fs-1 text-secondary opacity-50 d-none d-sm-block"></i>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     {/* --- Tabla de Desglose por Pago --- */}
-                    <h5 className="mb-3">Desglose por Método de Pago</h5>
+                    <h5 className="mb-3"><i className="bi bi-cash-stack text-success me-2"></i>Desglose por Método de Pago</h5>
                     <div className="table-responsive">
                         <table className="table table-bordered">
                             <thead className="table-light">
@@ -113,7 +208,6 @@ function ReportesPage() {
                                     datos.resumen_pagos.map((pago, index) => (
                                         <tr key={index}>
                                             <td className="text-capitalize">
-                                                {/* Iconos dinámicos */}
                                                 {pago.metodo_pago === 'efectivo' && <i className="bi bi-cash-coin me-2 text-success"></i>}
                                                 {pago.metodo_pago === 'tarjeta' && <i className="bi bi-credit-card me-2 text-primary"></i>}
                                                 {pago.metodo_pago === 'transferencia' && <i className="bi bi-qr-code me-2 text-info"></i>}

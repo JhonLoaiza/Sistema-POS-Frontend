@@ -66,7 +66,7 @@ function HistorialComprasPage() {
 
     return (
         <PageWrapper title="Historial de Compras">
-            
+            {/* eslint-disable react/jsx-no-literals */}
             {/* --- FILTROS DE FECHA --- */}
             <div className="row mb-4 align-items-end p-3 bg-light rounded border-start border-4 border-primary">
                 <div className="col-md-3">
@@ -93,11 +93,14 @@ function HistorialComprasPage() {
                     </small>
                 </div>
             </div>
+            {/* eslint-enable react/jsx-no-literals */}
             {/* ------------------------- */}
 
             {loading ? (
                 <div className="text-center p-5"><div className="spinner-border text-primary"></div></div>
             ) : (
+                <>
+                {/* eslint-disable react/jsx-no-literals */}
                 <div className="table-responsive">
                     <table className="table table-hover align-middle">
                         <thead className="table-light">
@@ -142,6 +145,8 @@ function HistorialComprasPage() {
                         </tbody>
                     </table>
                 </div>
+                {/* eslint-enable react/jsx-no-literals */}
+                </>
             )}
 
             <DetalleCompraModal 

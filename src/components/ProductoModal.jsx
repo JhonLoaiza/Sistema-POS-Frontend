@@ -130,9 +130,9 @@ function ProductoModal({ show, handleClose, producto, onSave }) {
             <Modal.Body>
                 <Form onSubmit={handleSubmit}>
                     
-                    {/* Fila 1: Nombre y Código */}
+                    {/* Fila 1: Nombre */}
                     <Row className="mb-3">
-                        <Col md={8}>
+                        <Col md={12}>
                             <Form.Group>
                                 <Form.Label>Nombre del Producto</Form.Label>
                                 <Form.Control 
@@ -143,20 +143,6 @@ function ProductoModal({ show, handleClose, producto, onSave }) {
                                     required 
                                     autoFocus
                                 />
-                            </Form.Group>
-                        </Col>
-                        <Col md={4}>
-                            <Form.Group>
-                                <Form.Label>Código Barras</Form.Label>
-                                <InputGroup>
-                                    <InputGroup.Text><i className="bi bi-upc"></i></InputGroup.Text>
-                                    <Form.Control 
-                                        type="text" 
-                                        name="codigo_barras" 
-                                        value={formData.codigo_barras || ''} 
-                                        onChange={handleChange} 
-                                    />
-                                </InputGroup>
                             </Form.Group>
                         </Col>
                     </Row>
@@ -249,6 +235,24 @@ function ProductoModal({ show, handleClose, producto, onSave }) {
                                         <Image src={`http://localhost:5000/${formData.imagen}`} thumbnail style={{ maxHeight: '100px' }} />
                                     ) : null}
                                 </div>
+                            </Form.Group>
+                        </Col>
+                    </Row>
+
+                    {/* Código de Barras al final */}
+                    <Row className="mb-3">
+                        <Col md={12}>
+                            <Form.Group>
+                                <Form.Label>Código de Barras</Form.Label>
+                                <InputGroup>
+                                    <InputGroup.Text><i className="bi bi-upc"></i></InputGroup.Text>
+                                    <Form.Control 
+                                        type="text" 
+                                        name="codigo_barras" 
+                                        value={formData.codigo_barras || ''} 
+                                        onChange={handleChange} 
+                                    />
+                                </InputGroup>
                             </Form.Group>
                         </Col>
                     </Row>
